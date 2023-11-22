@@ -2,6 +2,8 @@
 include_once("db.php");
 include_once("student.php");
 
+
+
 $db = new Database();
 $connection = $db->getConnection();
 $student = new Student($db);
@@ -30,7 +32,7 @@ $student = new Student($db);
             // Fetch data from the server and create a chart
             // Replace the following lines with actual data retrieval and processing
             var data = {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November'],
                 datasets: [{
                     label: 'Number of Students',
                     data: [10, 20, 15, 25, 30, 22],
