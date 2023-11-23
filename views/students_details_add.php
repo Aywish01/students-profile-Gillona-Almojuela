@@ -10,7 +10,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     'contact_number' => $_POST['contact_number'],
     'street' => $_POST['street'],
     'town_city' => $_POST['town_city'],
-    'students' => $_POST['students'],
+    'province' => $_POST['province'],
     'zip_code' => $_POST['zip_code'],
 
     ];
