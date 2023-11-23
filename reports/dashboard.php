@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -20,6 +19,12 @@
     <!-- Chart.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
 
+    <style>
+        .chart {
+            width: 100px;
+            height: 100x;
+        }
+    </style>
 </head>
 <body>
     <div class="wrapper">
@@ -34,7 +39,7 @@
                                     <p class="category">Orders shipped by every Shipper</p>
                                 </div>
                                 <div class="content">
-                                    <canvas id="chartShippers"></canvas>
+                                    <canvas id="chartShippers" class="chart"></canvas>
                                     <?php
                                     require('config/config.php');
                                     require('config/db.php');

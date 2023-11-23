@@ -10,8 +10,8 @@
       <a href="#" class="dropbtn">Reports</a>
       <div class="dropdown-content">
         <a href="reports/dashboard.php">Report1</a>
-        <a href="#">Report 2</a>
-        <a href="#">Report 3</a>
+        <a href="reports/dashboard2.php">Report 2</a>
+        <a href="reports/dashboard3.php">Report 3</a>
       </div>
     </li>
   </ul>
