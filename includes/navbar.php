@@ -9,7 +9,7 @@
     <li class="dropdown">
       <a href="#" class="dropbtn">Reports</a>
       <div class="dropdown-content">
-        <a href="#">Report 1</a>
+        <a href="reports/dashboard.php">Report1</a>
         <a href="#">Report 2</a>
         <a href="#">Report 3</a>
       </div>

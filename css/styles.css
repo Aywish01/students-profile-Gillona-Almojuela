@@ -48,6 +48,9 @@
   h1 {
     color: #131313;
   }
+  p {
+    color: #131313;
+  }
   
   .dropdown {
     position: relative;
@@ -63,13 +66,13 @@
   .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #D8F3DC;
+    background-color: #fcfafa;
     min-width: 160px;
     z-index: 1;
   }
   
   .dropdown-content a {
-    color: #74C69D;
+    color: #0a0a0a;
     text-decoration: none;
     display: block;
     padding: 10px;
