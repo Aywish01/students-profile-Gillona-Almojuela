@@ -1,5 +1,6 @@
 <?php
-include_once("db.php"); // Include the file with the Database class
+
+include_once("db.php");
 
 class StudentDetails {
     private $db;
@@ -8,14 +9,11 @@ class StudentDetails {
         $this->db = $db;
     }
 
-    // Create a student detail entry and link it to a student
     public function create($data) {
         try {
-            // Prepare the SQL INSERT statement
-            $sql = "INSERT INTO student_details(student_id, contact_number, street, zip_code, town_city, province) VALUES(:student_id, :contact_number, :street, :zip_code, :town_city, :province);";
+            $sql = "INSERT INTO student_details (student_id, contact_number, street, zip_code, town_city, province) VALUES (:student_id, :contact_number, :street, :zip_code, :town_city, :province);";
             $stmt = $this->db->getConnection()->prepare($sql);
 
-            // Bind values to placeholders
             $stmt->bindParam(':student_id', $data['student_id']);
             $stmt->bindParam(':contact_number', $data['contact_number']);
             $stmt->bindParam(':street', $data['street']);
@@ -23,132 +21,140 @@ class StudentDetails {
             $stmt->bindParam(':town_city', $data['town_city']);
             $stmt->bindParam(':province', $data['province']);
 
-            // Execute the INSERT query
             $stmt->execute();
 
-            // Check if the insert was successful
             return $stmt->rowCount() > 0;
 
         } catch (PDOException $e) {
-            // Handle any potential errors here
-            echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            $this->logError($e);
+            throw $e;
         }
     }
 
-    // Get all student details
     public function getAll() {
         try {
-            // Prepare the SQL SELECT statement
-            $sql = "SELECT * FROM student_details";
+            $sql = "SELECT * FROM student_details ORDER BY id DESC LIMIT 20";
             $stmt = $this->db->getConnection()->prepare($sql);
-
-            // Execute the SELECT query
             $stmt->execute();
 
-            // Fetch all rows as an associative array
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {
-            // Handle any potential errors here
-            echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            $this->logError($e);
+            throw $e;
         }
     }
 
-    // Delete a student detail entry
+    public function getById($id) {
+        $query = "SELECT * FROM student_details WHERE id = :id";
+        $stmt = $this->db->getConnection()->prepare($query);
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function delete($studentDetailId) {
         try {
-            // Prepare the SQL DELETE statement
             $sql = "DELETE FROM student_details WHERE id = :id";
             $stmt = $this->db->getConnection()->prepare($sql);
 
-            // Bind the value to the placeholder
             $stmt->bindParam(':id', $studentDetailId);
 
-            // Execute the DELETE query
             $stmt->execute();
 
-            // Check if the delete was successful
             return $stmt->rowCount() > 0;
 
         } catch (PDOException $e) {
-            // Handle any potential errors here
-            echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            $this->logError($e);
+            throw $e;
         }
     }
 
-    // Update a student detail entry
-    public function update($studentDetailId, $data) {
+    public function update($id, $studentId, $contactNumber, $street, $townCity, $province, $zipCode) {
         try {
-            // Prepare the SQL UPDATE statement
-            $sql = "UPDATE student_details SET contact_number = :contact_number, street = :street, zip_code = :zip_code, town_city = :town_city, province = :province WHERE id = :id";
-            $stmt = $this->db->getConnection()->prepare($sql);
+            $query = "UPDATE student_details SET student_id = :studentId, contact_number = :contactNumber, street = :street, town_city = :townCity, province = :province, zip_code = :zipCode WHERE id = :id";
+            $stmt = $this->db->getConnection()->prepare($query);
 
-            // Bind values to placeholders
-            $stmt->bindParam(':id', $studentDetailId);
-            $stmt->bindParam(':contact_number', $data['contact_number']);
-            $stmt->bindParam(':street', $data['street']);
-            $stmt->bindParam(':zip_code', $data['zip_code']);
-            $stmt->bindParam(':town_city', $data['town_city']);
-            $stmt->bindParam(':province', $data['province']);
+            $stmt->bindParam(':studentId', $studentId);
+            $stmt->bindParam(':contactNumber', $contactNumber);
+            $stmt->bindParam(':street', $street);
+            $stmt->bindParam(':townCity', $townCity);
+            $stmt->bindParam(':province', $province);
+            $stmt->bindParam(':zipCode', $zipCode);
+            $stmt->bindParam(':id', $id);
 
-            // Execute the UPDATE query
             $stmt->execute();
 
-            // Check if the update was successful
             return $stmt->rowCount() > 0;
 
         } catch (PDOException $e) {
-            // Handle any potential errors here
-            echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            $this->logError($e);
+            throw $e;
         }
     }
-
-    // Add a new student detail entry or update if it already exists
     public function addOrUpdate($data) {
         try {
-            // Check if the student detail entry already exists
             $existingDetail = $this->getDetailByStudentId($data['student_id']);
 
             if ($existingDetail) {
-                // If exists, update the entry
-                return $this->update($existingDetail['id'], $data);
+                return $this->update($existingDetail['id'], $data['student_id'], $data['contact_number'], $data['street'], $data['town_city'], $data['province'], $data['zip_code']);
             } else {
-                // If not, create a new entry
                 return $this->create($data);
             }
 
         } catch (PDOException $e) {
-            // Handle any potential errors here
-            echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            $this->logError($e);
+            throw $e;
         }
     }
 
-    // Get student detail by student ID
+    public function edit($studentDetailId, $data) {
+        try {
+            $existingDetail = $this->getDetailByStudentId($studentDetailId);
+    
+            if ($existingDetail) {
+                return $this->update(
+                    $existingDetail['id'],
+                    $data['student_id'],
+                    $data['contact_number'],
+                    $data['street'],
+                    $data['town_city'],
+                    $data['province'],
+                    $data['zip_code']
+                );
+            } else {
+                return false;
+            }
+    
+        } catch (PDOException $e) {
+            $this->logError($e);
+            throw $e;
+        }
+    }
+    
+
     public function getDetailByStudentId($studentId) {
         try {
-            // Prepare the SQL SELECT statement
             $sql = "SELECT * FROM student_details WHERE student_id = :student_id";
             $stmt = $this->db->getConnection()->prepare($sql);
 
-            // Bind the value to the placeholder
             $stmt->bindParam(':student_id', $studentId);
 
-            // Execute the SELECT query
             $stmt->execute();
 
-            // Fetch the first row as an associative array
+            // Use fetch instead of fetchAll
             return $stmt->fetch(PDO::FETCH_ASSOC);
 
         } catch (PDOException $e) {
-            // Handle any potential errors here
-            echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            $this->logError($e);
+            throw $e;
         }
     }
+
+    public function logError($e) {
+        echo "Error: " . $e->getMessage();
+    }
 }
+
 ?>

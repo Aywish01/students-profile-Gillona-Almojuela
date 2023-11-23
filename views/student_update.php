@@ -7,8 +7,8 @@ if (isset($_GET['id'])) {
 
     // Fetch student data by ID from the database
     $db = new Database();
-    $student = new Student($db);
-    $studentData = $student->read($id); // Implement the read method in the Student class
+    $students = new Student($db);
+    $studentData = $students->read($id); // Implement the read method in the Student class
 
     if ($studentData) {
         // The student data is retrieved, and you can pre-fill the edit form with this data.

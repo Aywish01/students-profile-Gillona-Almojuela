@@ -16,7 +16,7 @@ if (isset($_GET['id'])) {
     // Check if the deletion was successful
     if ($deleted) {
         // Redirect to the page showing the remaining records
-        header("Location: student_list.php");
+        header("Location: students_details.view.php");
         exit();
     } else {
         // Handle the case where deletion fails (you may want to show an error message)
@@ -24,7 +24,7 @@ if (isset($_GET['id'])) {
     }
 } else {
     // Redirect to the page showing the list of students if 'id' is not set
-    header("Location: student_list.php");
+    header("Location: students_details.view.php");
     exit();
 }
 ?>

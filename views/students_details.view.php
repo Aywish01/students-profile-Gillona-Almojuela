@@ -14,19 +14,6 @@ $students = new StudentDetails($db);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Details</title>
     <link rel="stylesheet" type="text/css" href="../css/styles.css">
-    <style>
-        .content {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 10px; /* Optional: Add padding for better appearance */
-        }
-
-        .button-link {
-            align-self: flex-start;
-            margin-bottom: 10px; /* Adjust the margin as needed */
-        }
-    </style>
 </head>
 <body>
     <!-- Include the header -->
@@ -34,10 +21,8 @@ $students = new StudentDetails($db);
     <?php include('../includes/navbar.php'); ?>
 
     <div class="content">
-        <a class="button-link" href="students_details_add.php">Add New Record</a>
-
-        <h2>Students Details</h2>
-        <table class="orange-theme">
+    <h2>Students Details</h2>
+    <table class="orange-theme">
         <thead>
             <tr>
                     <th>ID</th>
@@ -78,6 +63,8 @@ $students = new StudentDetails($db);
            
         </tbody>
     </table>
+        
+    <a class="button-link" href="students_details_add.php">Add New Record</a>
 
         </div>
         

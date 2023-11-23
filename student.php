@@ -1,5 +1,5 @@
 <?php
-include_once("db.php"); // Include the file with the Database class
+include_once("db.php");
 
 class Student {
     private $db;
@@ -10,33 +10,44 @@ class Student {
 
     public function create($data) {
         try {
-            // Prepare the SQL INSERT statement
             $sql = "INSERT INTO students(student_number, first_name, middle_name, last_name, gender, birthday) 
-            VALUES(:student_number, :first_name, :middle_name, :last_name, :gender, :birthday);";
+                    VALUES(:student_number, :first_name, :middle_name, :last_name, :gender, :birthday);";
             $stmt = $this->db->getConnection()->prepare($sql);
 
-            // Bind values to placeholders
             $stmt->bindParam(':student_number', $data['student_number']);
             $stmt->bindParam(':first_name', $data['first_name']);
             $stmt->bindParam(':middle_name', $data['middle_name']);
             $stmt->bindParam(':last_name', $data['last_name']);
-            $stmt->bindParam(':gender', $data['gender']);
+            $stmt->bindParam(':gender', $data['gender']); // Keep this as is
             $stmt->bindParam(':birthday', $data['birthday']);
 
-            // Execute the INSERT query
             $stmt->execute();
 
-            // Check if the insert was successful
-             
-            if($stmt->rowCount() > 0)
-            {
+            if ($stmt->rowCount() > 0) {
                 return $this->db->getConnection()->lastInsertId();
             }
-
         } catch (PDOException $e) {
-            // Handle any potential errors here
             echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            throw $e;
+        }
+    }
+
+    public function displayAll(){
+        try {
+            $sql = "SELECT * FROM students LIMIT 10";
+            $stmt = $this->db->getConnection()->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($result as &$row) {
+                $row['gender'] = ($row['gender'] == '1') ? 'M' : 'F';
+                $row['birthday'] = date('M d Y', strtotime($row['birthday']));
+            }
+
+            return $result;
+        } catch (PDOException $e) {
+            echo "Error: " . $e->getMessage();
+            throw $e;
         }
     }
 
@@ -49,13 +60,12 @@ class Student {
             $stmt->bindValue(':id', $id);
             $stmt->execute();
 
-            // Fetch the student data as an associative array
             $studentData = $stmt->fetch(PDO::FETCH_ASSOC);
 
             return $studentData;
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            throw $e;
         }
     }
 
@@ -71,7 +81,7 @@ class Student {
                     WHERE id = :id";
 
             $stmt = $this->db->getConnection()->prepare($sql);
-            // Bind parameters
+
             $stmt->bindValue(':id', $data['id']);
             $stmt->bindValue(':student_number', $data['student_number']);
             $stmt->bindValue(':first_name', $data['first_name']);
@@ -80,13 +90,12 @@ class Student {
             $stmt->bindValue(':gender', $data['gender']);
             $stmt->bindValue(':birthday', $data['birthday']);
 
-            // Execute the query
             $stmt->execute();
 
             return $stmt->rowCount() > 0;
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            throw $e;
         }
     }
 
@@ -97,35 +106,17 @@ class Student {
             $stmt->bindValue(':id', $id);
             $stmt->execute();
 
-            // Check if any rows were affected (record deleted)
             if ($stmt->rowCount() > 0) {
-                return true; // Record deleted successfully
+                return true;
             } else {
-                return false; // No records were deleted (student_id not found)
+                return false;
             }
         } catch (PDOException $e) {
             echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
+            throw $e;
         }
     }
 
-    public function displayAll(){
-        try {
-            $sql = "SELECT * FROM students LIMIT 10"; // Modify the table name to match your database
-            $stmt = $this->db->getConnection()->prepare($sql);
-            $stmt->execute();
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            return $result;
-        } catch (PDOException $e) {
-            // Handle any potential errors here
-            echo "Error: " . $e->getMessage();
-            throw $e; // Re-throw the exception for higher-level handling
-        }
-    }
- 
-    /*
-        sample simple tests
-    */
     public function testCreateStudent() {
         $data = [
             'student_number' => 'S12345',
@@ -178,16 +169,11 @@ class Student {
     }
 }
 
-
+// Uncomment the code below to test the modifications
 // $student = new Student(new Database());
 
-// // Test the create method
 // $student_id = $student->testCreateStudent();
-
-// // Test the read method with the created student ID
 // $student->testReadStudent($student_id);
-
-// // Test the update method with the created student ID and updated data
 // $update_data = [
 //     'id' => $student_id,
 //     'student_number' => 'S67890',
@@ -198,8 +184,5 @@ class Student {
 //     'birthday' => '1995-05-20',
 // ];
 // $student->testUpdateStudent($student_id, $update_data);
-
-// // Test the delete method with the created student ID
 // $student->testDeleteStudent($student_id);
-
 ?>
