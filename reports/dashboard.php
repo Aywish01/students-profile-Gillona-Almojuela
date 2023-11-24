@@ -1,122 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="utf-8" />
-    <link rel="apple-touch-icon" sizes="76x76" href="../assets/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="../assets/img/favicon.ico">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <title>Light Bootstrap Dashboard - Free Bootstrap 4 Admin Dashboard by Creative Tim</title>
-    <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
-    <!-- Fonts and icons -->
-    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" />
-    <!-- CSS Files -->
-    <link href="../assets/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="../assets/css/light-bootstrap-dashboard.css?v=2.0.0 " rel="stylesheet" />
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link href="../assets/css/demo.css" rel="stylesheet" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <?php include('config/config.php'); ?>
+    <?php include('config/db.php'); ?>
 
-    <!-- Chart.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <?php
+    // Fetch the counts of male and female students from the database
+    $sql = "SELECT gender, COUNT(*) as count FROM students GROUP BY gender";
+    $result = $conn->query($sql);
 
-    <style>
-        .chart {
-            width: 100px;
-            height: 100x;
+    // Check if there are results
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $genderLabel = ($row["gender"] == 0) ? "Male" : "Female";
+            $dataPoints[] = array("label" => $genderLabel, "y" => $row["count"]);
         }
-    </style>
+    } else {
+        echo "No data found";
+    }
+
+    // Close the database connection
+    $conn->close();
+    ?>
+
+    <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
+    <script>
+        window.onload = function () {
+            var chart = new CanvasJS.Chart("chartContainer", {
+                theme: "light2",
+                animationEnabled: true,
+                title: {
+                    text: "Gender Distribution of Students"
+                },
+                data: [{
+                    type: "pie",
+                    indexLabel: "{label} - {y}",
+                    yValueFormatString: "#,##0.00\"%\"",
+                    indexLabelPlacement: "inside",
+                    indexLabelFontColor: "#36454F",
+                    indexLabelFontSize: 18,
+                    indexLabelFontWeight: "bolder",
+                    startAngle: 90, // Change startAngle to make it horizontal
+                    showInLegend: true,
+                    legendText: "{label}",
+                    dataPoints: <?php echo json_encode($dataPoints, JSON_NUMERIC_CHECK); ?>
+                }]
+            });
+            chart.render();
+        }
+    </script>
 </head>
+
 <body>
-    <div class="wrapper">
-        <div class="main-panel">
-            <div class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="header">
-                                    <h4 class="title">Shippers Statistics</h4>
-                                    <p class="category">Orders shipped by every Shipper</p>
-                                </div>
-                                <div class="content">
-                                    <canvas id="chartShippers" class="chart"></canvas>
-                                    <?php
-                                    require('config/config.php');
-                                    require('config/db.php');
-                                    $query01 = "SELECT shippers.CompanyName, (Count(*)/(SELECT COUNT(*) FROM northwind.orders) * 100) as Count_Orders FROM northwind.orders, northwind.shippers WHERE shippers.ShipperID=orders.ShipVia GROUP BY ShipVia;";
-                                    $result01 = mysqli_query($conn, $query01);
-                                    if (mysqli_num_rows($result01) > 0) {
-                                        $Count_Orders = array();
-                                        $label_piechart = array();
-                                        while ($row = mysqli_fetch_array($result01)) {
-                                            $Count_Orders[] = $row['Count_Orders'];
-                                            $label_piechart[] = $row['CompanyName'];
-                                        }
-                                        mysqli_free_result($result01);
-                                        mysqli_close($conn);
-                                    } else {
-                                        echo "No records matching your query were found.";
-                                    }
-                                    ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <script>
-                        const Count_Orders = <?php echo json_encode($Count_Orders); ?>;
-                        const label_piechart = <?php echo json_encode($label_piechart); ?>;
-                        const data1 = {
-                            labels: label_piechart,
-                            datasets: [{
-                                label: 'My First Dataset',
-                                data: Count_Orders,
-                                backgroundColor: [
-                                    'rgb(255, 99, 132)',
-                                    'rgb(54, 162, 235)',
-                                    'rgb(255,165,0)'
-                                ],
-                                hoverOffset: 4
-                            }]
-                        };
-                        const config = {
-                            type: 'pie',
-                            data: data1,
-                        };
-                        const chartShippers = new Chart(
-                            document.getElementById('chartShippers'),
-                            config
-                        );
-                    </script>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php include('../templates/header.html'); ?>
+    <?php include('../includes/navbar.php'); ?>
+
+    <div style="text-align: center;">
+    <div id="chartContainer" style="height: 550px; display: inline-block; margin-right: 220px;"></div>
+</div>
+
+    <?php include('../templates/footer.html'); ?>
 </body>
-
-<!--   Core JS Files   -->
-<script src="../assets/js/core/jquery.3.2.1.min.js" type="text/javascript"></script>
-<script src="../assets/js/core/popper.min.js" type="text/javascript"></script>
-<script src="../assets/js/core/bootstrap.min.js" type="text/javascript"></script>
-<!--  Plugin for Switches, full documentation here: http://www.jque.re/plugins/version3/bootstrap.switch/ -->
-<script src="../assets/js/plugins/bootstrap-switch.js"></script>
-<!--  Google Maps Plugin    -->
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
-<!--  Chartist Plugin  -->
-<script src="../assets/js/plugins/chartist.min.js"></script>
-<!--  Notifications Plugin    -->
-<script src="../assets/js/plugins/bootstrap-notify.js"></script>
-<!-- Control Center for Light Bootstrap Dashboard: scripts for the example pages etc -->
-<script src="../assets/js/light-bootstrap-dashboard.js?v=2.0.0 " type="text/javascript"></script>
-<!-- Light Bootstrap Dashboard DEMO methods, don't include it in your project! -->
-<script src="../assets/js/demo.js"></script>
-<script type="text/javascript">
-    $(document).ready(function() {
-        // Javascript method's body can be found in assets/js/demos.js
-        demo.initDashboardPageCharts();
-
-        demo.showNotification();
-
-    });
-</script>
 
 </html>

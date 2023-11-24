@@ -18,7 +18,7 @@ class Student {
             $stmt->bindParam(':first_name', $data['first_name']);
             $stmt->bindParam(':middle_name', $data['middle_name']);
             $stmt->bindParam(':last_name', $data['last_name']);
-            $stmt->bindParam(':gender', $data['gender']); // Keep this as is
+            $stmt->bindParam(':gender', $data['gender']); 
             $stmt->bindParam(':birthday', $data['birthday']);
 
             $stmt->execute();
@@ -167,7 +167,19 @@ class Student {
             echo "Test failed. Unable to delete student data." . PHP_EOL;
         }
     }
+
+    public function getGenderCount($gender) {
+        $query = "SELECT COUNT(*) as count FROM students WHERE gender = :gender";
+        $stmt = $this->db->getConnection()->prepare($query);
+        $stmt->bindParam(':gender', $gender);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['count'];
+    }
 }
+
+
 
 // Uncomment the code below to test the modifications
 // $student = new Student(new Database());

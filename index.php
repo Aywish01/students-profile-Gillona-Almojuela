@@ -1,7 +1,8 @@
 <?php
 include_once("db.php");
 include_once("student.php");
-include_once("student_details.php");
+
+
 
 
 
